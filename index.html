@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Living Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --void:    #06040200;
+  --dark:    #0d0a07;
+  --surface: #131009;
+  --card:    #1c1610;
+  --raised:  #231d14;
+  --border:  #2e2418;
+  --border2: #3d3020;
+  --ember:   #9a5e22;
+  --amber:   #c8844a;
+  --gold:    #d4a84c;
+  --glow:    #e8c87a;
+  --muted:   #4a3c28;
+  --dim:     #7a6448;
+  --sub:     #a08060;
+  --text:    #d4c4a0;
+  --bright:  #ede0c4;
+  --white:   #f5edd8;
+  --rose:    #9a4448;
+  --locked-text: #3a2e1e;
+}
+
+html, body { height: 100%; background: var(--dark); color: var(--text); font-family: 'EB Garamond', serif; overflow-x: hidden; }
+
+/* ── GRAIN OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 9000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+/* ════════════════════════════════════
+   SCREENS
+════════════════════════════════════ */
+.screen { display: none; min-height: 100vh; }
+.screen.visible { display: flex; }
+
+/* ════════════════════════════════════
+   PROLOGUE / PASSWORD SCREEN
+════════════════════════════════════ */
+#s-prologue {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background: var(--dark);
+  position: relative;
+  overflow: hidden;
+}
+
+/* deep radial vignette */
+#s-prologue::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse 55% 55% at 50% 48%, transparent 0%, rgba(4,3,2,0.85) 100%);
+  pointer-events: none;
+}
+
+/* ── CANDLE ── */
+.candle-wrap {
+  position: relative;
+  width: 80px;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.candle-glow {
+  position: absolute;
+  top: -30px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(200,130,70,0.22) 0%, rgba(200,130,70,0.06) 40%, transparent 70%);
+  animation: glow-pulse 4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes glow-pulse {
+  0%   { transform: scale(1);    opacity: 0.8; }
+  30%  { transform: scale(1.12); opacity: 1; }
+  60%  { transform: scale(0.95); opacity: 0.7; }
+  100% { transform: scale(1.08); opacity: 0.9; }
+}
+
+.candle-flame-wrap {
+  position: relative;
+  width: 18px; height: 40px;
+  margin-bottom: -2px;
+}
+
+.flame {
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 14px; height: 32px;
+  background: radial-gradient(ellipse 60% 80% at 50% 80%, #ffdd88 0%, #ffaa44 40%, #cc5500 80%, transparent 100%);
+  border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+  animation: flame-flicker 1.8s ease-in-out infinite alternate;
+  filter: blur(0.5px);
+}
+
+.flame-inner {
+  position: absolute;
+  bottom: 4px; left: 50%;
+  transform: translateX(-50%);
+  width: 6px; height: 16px;
+  background: radial-gradient(ellipse 60% 80% at 50% 80%, #fff8e0 0%, #ffe088 60%, transparent 100%);
+  border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+  animation: flame-flicker 1.2s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes flame-flicker {
+  0%   { transform: translateX(-50%) scaleX(1)    scaleY(1)    skewX(0deg); }
+  25%  { transform: translateX(-53%) scaleX(0.92) scaleY(1.04) skewX(-2deg); }
+  50%  { transform: translateX(-50%) scaleX(1.04) scaleY(0.96) skewX(1deg); }
+  75%  { transform: translateX(-47%) scaleX(0.95) scaleY(1.06) skewX(2deg); }
+  100% { transform: translateX(-50%) scaleX(1)    scaleY(1)    skewX(-1deg); }
+}
+
+.candle-body {
+  width: 22px;
+  height: 70px;
+  background: linear-gradient(to right, #c8b890 0%, #e8ddb8 35%, #f0e8c8 50%, #d8c898 70%, #b8a878 100%);
+  border-radius: 2px 2px 3px 3px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+
+.candle-body::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 2px; right: 2px;
+  height: 8px;
+  background: linear-gradient(to bottom, rgba(200,180,140,0.5), transparent);
+  border-radius: 2px 2px 0 0;
+}
+
+.candle-base {
+  width: 28px; height: 6px;
+  background: linear-gradient(to right, #5a4020, #8a6030, #a07040, #7a5028, #4a3018);
+  border-radius: 1px 1px 3px 3px;
+}
+
+/* ── PROLOGUE TEXT ── */
+.prologue-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.6rem, 5vw, 3rem);
+  color: var(--gold);
+  letter-spacing: 0.12em;
+  margin-bottom: 1rem;
+  z-index: 1;
+  text-shadow: 0 0 40px rgba(212,168,76,0.3);
+  animation: fadeInUp 1s 0.3s ease both;
+  opacity: 0;
+}
+
+.prologue-ornament {
+  font-size: 1.2rem;
+  color: var(--amber);
+  opacity: 0.5;
+  letter-spacing: 0.5em;
+  margin-bottom: 1.5rem;
+  z-index: 1;
+  animation: fadeInUp 1s 0.6s ease both;
+  opacity: 0;
+}
+
+.prologue-text {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--sub);
+  max-width: 520px;
+  line-height: 1.9;
+  margin-bottom: 2.5rem;
+  z-index: 1;
+  animation: fadeInUp 1s 0.9s ease both;
+  opacity: 0;
+}
+
+.prologue-text strong { color: var(--amber); font-style: normal; font-weight: 400; }
+
+/* ── PASSWORD ── */
+.pw-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  z-index: 1;
+  animation: fadeInUp 1s 1.2s ease both;
+  opacity: 0;
+}
+
+.pw-input {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  padding: 0.8rem 1.8rem;
+  font-family: 'EB Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--bright);
+  text-align: center;
+  letter-spacing: 0.25em;
+  width: 250px;
+  outline: none;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.pw-input::placeholder { color: var(--muted); letter-spacing: 0.1em; font-style: italic; }
+.pw-input:focus { border-color: var(--ember); box-shadow: 0 0 24px rgba(200,130,70,0.12); }
+
+.pw-btn {
+  background: transparent;
+  border: 1px solid var(--ember);
+  color: var(--amber);
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 0.7rem 2.5rem;
+  cursor: pointer;
+  transition: all 0.35s;
+  border-radius: 1px;
+}
+.pw-btn:hover { background: rgba(200,130,70,0.1); color: var(--gold); border-color: var(--gold); }
+
+.pw-err {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  color: var(--rose);
+  font-size: 0.9rem;
+  height: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.pw-err.show { opacity: 1; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ════════════════════════════════════
+   MAIN SCREEN
+════════════════════════════════════ */
+#s-main {
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--dark);
+}
+
+/* ── HEADER ── */
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 1.1rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  gap: 1rem;
+}
+
+.header-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.header-right { display: flex; align-items: center; gap: 0.8rem; flex-shrink: 0; }
+
+.hdr-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--sub);
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 1px;
+  white-space: nowrap;
+}
+.hdr-btn:hover { color: var(--amber); border-color: var(--amber); }
+.hdr-btn.mood { border-color: rgba(100,140,100,0.4); color: #7aaa7a; }
+.hdr-btn.mood:hover { background: rgba(100,140,100,0.1); color: #9acc9a; border-color: #7aaa7a; }
+
+/* ── LAYOUT ── */
+.app-body {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 0;
+  flex: 1;
+  min-height: calc(100vh - 57px);
+}
+
+@media (max-width: 800px) {
+  .app-body { grid-template-columns: 1fr; }
+}
+
+/* ── LEFT PANEL: TRACKER ── */
+.tracker-panel {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 2rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+}
+
+.panel-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amber);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.panel-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--border2), transparent); }
+
+/* pages counter */
+.pages-counter {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+
+.pages-counter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 100%, rgba(200,130,70,0.07) 0%, transparent 70%);
+}
+
+.pages-num {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 3.5rem;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 30px rgba(212,168,76,0.25);
+}
+
+.pages-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.pages-subtext {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--dim);
+  margin-top: 0.6rem;
+}
+.pages-subtext .hl { color: var(--amber); font-style: normal; }
+
+/* progress to next chapter */
+.next-unlock {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1.2rem 1.4rem;
+  cursor: default;
+}
+
+.next-unlock-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.7rem;
+}
+
+.next-unlock-chapter {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  color: var(--amber);
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.progress-bar-wrap {
+  background: var(--border);
+  border-radius: 2px;
+  height: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--ember), var(--gold));
+  border-radius: 2px;
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 8px rgba(212,168,76,0.4);
+}
+
+.progress-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.82rem;
+  color: var(--dim);
+  margin-top: 0.5rem;
+}
+
+/* book list */
+.books-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.book-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+  group: true;
+}
+.book-item:hover { border-color: var(--border2); background: var(--raised); }
+
+.book-icon { font-size: 1.1rem; opacity: 0.7; flex-shrink: 0; }
+
+.book-info { flex: 1; min-width: 0; }
+.book-title-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.book-pages-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 0.15rem;
+}
+
+.book-edit-btn {
+  background: transparent; border: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 2px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+.book-item:hover .book-edit-btn { color: var(--dim); }
+.book-edit-btn:hover { color: var(--amber) !important; }
+
+.empty-books {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 1.5rem;
+  position: relative;
+}
+.empty-books::after {
+  content: attr(data-secret);
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ember);
+  margin-top: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.empty-books:hover::after { opacity: 1; }
+
+.add-book-btn {
+  background: transparent;
+  border: 1px dashed var(--border2);
+  color: var(--dim);
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 2px;
+  width: 100%;
+}
+.add-book-btn:hover { border-color: var(--ember); color: var(--amber); background: rgba(200,130,70,0.05); }
+
+/* ── RIGHT PANEL: CHAPTERS ── */
+.chapters-panel {
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+  background: var(--dark);
+}
+
+.chapters-intro {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--dim);
+  margin-bottom: 2rem;
+  line-height: 1.7;
+  max-width: 580px;
+  position: relative;
+  cursor: default;
+}
+.chapters-intro::after {
+  content: 'the more you read… the more this unfolds';
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ember);
+  margin-top: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.chapters-intro:hover::after { opacity: 1; }
+
+.chapters-grid { display: flex; flex-direction: column; gap: 1rem; max-width: 680px; }
+
+/* ── CHAPTER CARD ── */
+.chapter-card {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1.4rem 1.8rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s;
+}
+
+.chapter-card.unlocked {
+  background: var(--card);
+  cursor: pointer;
+  border-left: 3px solid var(--ember);
+}
+.chapter-card.unlocked:hover {
+  background: var(--raised);
+  border-left-color: var(--gold);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 0 1px var(--border2);
+  transform: translateX(4px);
+}
+
+.chapter-card.locked {
+  background: var(--surface);
+  cursor: default;
+  opacity: 0.7;
+}
+
+.chapter-card.new-unlock {
+  animation: unlockFlash 1.5s ease forwards;
+}
+
+@keyframes unlockFlash {
+  0%   { box-shadow: 0 0 0 0 rgba(212,168,76,0); }
+  30%  { box-shadow: 0 0 40px 10px rgba(212,168,76,0.25); }
+  100% { box-shadow: 0 0 0 0 rgba(212,168,76,0); }
+}
+
+.ch-number {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 0.4rem;
+}
+.unlocked .ch-number { color: var(--amber); }
+
+.ch-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.04em;
+}
+.locked .ch-title { color: var(--locked-text); filter: blur(3.5px); user-select: none; }
+
+.ch-subtitle {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--sub);
+}
+.locked .ch-subtitle { color: var(--muted); filter: blur(2px); user-select: none; }
+
+.ch-lock-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+.ch-lock-icon { font-size: 0.8rem; opacity: 0.4; }
+.ch-lock-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ch-read-tag {
+  position: absolute;
+  top: 1rem; right: 1.2rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.52rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: var(--border);
+  padding: 0.2rem 0.5rem;
+  border-radius: 1px;
+}
+
+.ch-arrow {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%; transform: translateY(-50%);
+  color: var(--ember);
+  font-size: 1.1rem;
+  opacity: 0;
+  transition: opacity 0.3s, right 0.3s;
+}
+.chapter-card.unlocked:hover .ch-arrow { opacity: 1; right: 1.2rem; }
+
+/* ════════════════════════════════════
+   CHAPTER READER SCREEN
+════════════════════════════════════ */
+#s-chapter {
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--dark);
+  align-items: center;
+}
+
+.reader-header {
+  width: 100%;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 1.1rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reader-back {
+  background: transparent; border: none;
+  color: var(--sub);
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.3s;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.reader-back:hover { color: var(--amber); }
+
+.reader-title-small {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.85rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+}
+
+.reader-body {
+  width: 100%;
+  max-width: 660px;
+  padding: 4rem 2rem 6rem;
+  animation: fadeInUp 0.6s ease both;
+}
+
+.reader-ornament {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--amber);
+  opacity: 0.4;
+  letter-spacing: 0.5em;
+  margin-bottom: 2rem;
+}
+
+.reader-chapter-num {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.8rem;
+}
+
+.reader-chapter-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  color: var(--gold);
+  line-height: 1.2;
+  margin-bottom: 0.6rem;
+  text-shadow: 0 0 30px rgba(212,168,76,0.2);
+}
+
+.reader-chapter-sub {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--sub);
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.reader-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.2rem;
+  line-height: 2.0;
+  color: var(--text);
+}
+
+.reader-text p { margin-bottom: 1.8rem; }
+
+.reader-text .drop-cap::first-letter {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 4.5rem;
+  font-weight: 700;
+  color: var(--amber);
+  float: left;
+  line-height: 0.7;
+  margin: 0.1em 0.12em 0 0;
+}
+
+.reader-sig {
+  font-family: 'Pinyon Script', cursive;
+  font-size: 2.2rem;
+  color: var(--amber);
+  text-align: right;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.reader-footer-ornament {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--muted);
+  letter-spacing: 0.5em;
+  margin-top: 3rem;
+}
+
+/* ════════════════════════════════════
+   MODALS
+════════════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(6,4,2,0.9);
+  backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+  padding: 2rem;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 2.5rem 3rem;
+  max-width: 460px;
+  width: 100%;
+  position: relative;
+  animation: modalPop 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.85) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 1.5rem;
+}
+
+.modal-close {
+  position: absolute; top: 1.2rem; right: 1.4rem;
+  background: transparent; border: none;
+  color: var(--muted); font-size: 1.1rem; cursor: pointer;
+  transition: color 0.3s;
+}
+.modal-close:hover { color: var(--sub); }
+
+/* add book modal */
+.modal-field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.2rem; }
+
+.modal-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.modal-input {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  padding: 0.7rem 1rem;
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  color: var(--bright);
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 100%;
+}
+.modal-input:focus { border-color: var(--ember); box-shadow: 0 0 16px rgba(200,130,70,0.1); }
+.modal-input::placeholder { color: var(--muted); font-style: italic; }
+
+.modal-submit {
+  background: transparent;
+  border: 1px solid var(--ember);
+  color: var(--amber);
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 0.8rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 1px;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+.modal-submit:hover { background: rgba(200,130,70,0.1); color: var(--gold); border-color: var(--gold); }
+
+/* mood modal */
+.mood-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.mood-option {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.mood-option:hover { border-color: var(--ember); background: var(--raised); }
+.mood-option.selected { border-color: var(--gold); background: var(--raised); }
+
+.mood-emoji { font-size: 1.8rem; display: block; margin-bottom: 0.4rem; }
+.mood-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sub);
+}
+
+.mood-response {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1.5rem 1.8rem;
+  display: none;
+  animation: fadeInUp 0.4s ease both;
+}
+.mood-response.show { display: block; }
+
+.mood-response-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.8rem;
+}
+
+.mood-response-text {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+/* break modal */
+.break-modal-box {
+  background: #0a0604;
+  border: 1px solid rgba(154,68,72,0.3);
+  border-radius: 4px;
+  padding: 3rem 3.5rem;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  animation: modalPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  text-align: center;
+}
+
+.break-icon { font-size: 2.5rem; margin-bottom: 1.5rem; animation: breathe 3s ease infinite; display: block; }
+@keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+.break-title {
+  font-family: 'Pinyon Script', cursive;
+  font-size: 2.8rem;
+  color: var(--rose);
+  margin-bottom: 1.5rem;
+  line-height: 1;
+}
+
+.break-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.15rem;
+  color: rgba(212,196,168,0.7);
+  line-height: 1.9;
+  margin-bottom: 2rem;
+}
+
+.break-close {
+  background: transparent;
+  border: 1px solid rgba(154,68,72,0.4);
+  color: rgba(154,68,72,0.7);
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.6rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 1px;
+}
+.break-close:hover { color: var(--rose); border-color: var(--rose); }
+
+/* ── FLOATING BREAK BUTTON ── */
+.break-float {
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  background: var(--surface);
+  border: 1px solid rgba(154,68,72,0.25);
+  color: rgba(154,68,72,0.5);
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.4s;
+  border-radius: 2px;
+  z-index: 200;
+  display: none;
+}
+.break-float:hover { color: var(--rose); border-color: rgba(154,68,72,0.6); background: rgba(154,68,72,0.08); }
+
+/* scroll */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+  SCREEN 1: PROLOGUE
+══════════════════════════════════════ -->
+<section id="s-prologue" class="screen visible">
+  <div class="candle-wrap">
+    <div class="candle-glow"></div>
+    <div class="candle-flame-wrap">
+      <div class="flame"><div class="flame-inner"></div></div>
+    </div>
+    <div class="candle-body"></div>
+    <div class="candle-base"></div>
+  </div>
+
+  <h1 class="prologue-title">The Living Book</h1>
+  <p class="prologue-ornament">— ✦ —</p>
+
+  <p class="prologue-text">
+    This book is about a girl who loves reading.<br>
+    She collects stories the way others collect breath —<br>
+    like she <strong>needs</strong> them to survive.<br><br>
+    She doesn't know yet that she is the story.
+  </p>
+
+  <div class="pw-wrap">
+    <input type="password" id="pw-input" class="pw-input" placeholder="your secret word…" maxlength="30">
+    <div class="pw-err" id="pw-err">The door doesn't recognize you, love.</div>
+    <button class="pw-btn" onclick="tryPassword()">Start Reading →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SCREEN 2: MAIN DASHBOARD
+══════════════════════════════════════ -->
+<section id="s-main" class="screen">
+  <header class="app-header">
+    <span class="header-title">The Living Book</span>
+    <div class="header-right">
+      <button class="hdr-btn mood" onclick="openModal('modal-mood')">✦ How do you feel?</button>
+      <button class="hdr-btn" onclick="openModal('modal-break')" title="When you feel low">🕯 Break the Story</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <!-- LEFT: Reading Tracker -->
+    <aside class="tracker-panel">
+      <p class="panel-label">Your Reading</p>
+
+      <!-- Pages Counter -->
+      <div class="pages-counter" title="You read books… I read you.">
+        <div class="pages-num" id="total-pages-display">0</div>
+        <div class="pages-label">Pages Read</div>
+        <div class="pages-subtext" id="tracker-subtext">No books yet…</div>
+      </div>
+
+      <!-- Progress to next chapter -->
+      <div class="next-unlock" id="next-unlock-wrap">
+        <div class="next-unlock-label">Next Chapter Unlocks</div>
+        <div class="next-unlock-chapter" id="next-chapter-label">—</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-text" id="progress-text">—</div>
+      </div>
+
+      <p class="panel-label">Your Books</p>
+
+      <div class="books-list" id="books-list">
+        <div class="empty-books"
+          data-secret="No books yet… but you're already my favourite story.">
+          Add a book to begin your journey ↓
+        </div>
+      </div>
+
+      <button class="add-book-btn" onclick="openModal('modal-add-book')">+ Log a Book</button>
+    </aside>
+
+    <!-- RIGHT: Chapters -->
+    <main class="chapters-panel">
+      <p class="panel-label">Your Chapters</p>
+
+      <p class="chapters-intro" data-secret="">
+        The more you read, the more this unfolds.<br>
+        Every page you turn out there unlocks something here.<br>
+        <em>This story was written entirely for you.</em>
+      </p>
+
+      <div class="chapters-grid" id="chapters-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SCREEN 3: CHAPTER READER
+══════════════════════════════════════ -->
+<section id="s-chapter" class="screen">
+  <div class="reader-header">
+    <button class="reader-back" onclick="goBack()">← Return to Library</button>
+    <span class="reader-title-small">The Living Book</span>
+    <div style="width:120px"></div>
+  </div>
+  <div class="reader-body" id="reader-body"><!-- JS fills this --></div>
+</section>
+
+<!-- ══════════════════════════════════════
+  MODAL: ADD / EDIT BOOK
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-add-book">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-add-book')">✕</button>
+    <p class="modal-title" id="add-book-modal-title">Log a Book</p>
+    <div class="modal-field">
+      <label class="modal-label" for="input-book-title">Book Title</label>
+      <input type="text" id="input-book-title" class="modal-input" placeholder="What are you reading?">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label" for="input-book-pages">Pages Read So Far</label>
+      <input type="number" id="input-book-pages" class="modal-input" placeholder="e.g. 120" min="0">
+    </div>
+    <button class="modal-submit" id="add-book-submit-btn" onclick="submitBook()">Add to My Story →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+  MODAL: MOOD
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-mood">
+  <div class="modal-box" style="max-width:500px">
+    <button class="modal-close" onclick="closeModal('modal-mood')">✕</button>
+    <p class="modal-title">How Are You Right Now?</p>
+    <div class="mood-grid">
+      <div class="mood-option" onclick="selectMood('tired')">
+        <span class="mood-emoji">🌙</span>
+        <span class="mood-name">Tired</span>
+      </div>
+      <div class="mood-option" onclick="selectMood('happy')">
+        <span class="mood-emoji">☀️</span>
+        <span class="mood-name">Happy</span>
+      </div>
+      <div class="mood-option" onclick="selectMood('overthinking')">
+        <span class="mood-emoji">🌊</span>
+        <span class="mood-name">Overthinking</span>
+      </div>
+      <div class="mood-option" onclick="selectMood('sad')">
+        <span class="mood-emoji">🕯️</span>
+        <span class="mood-name">Sad</span>
+      </div>
+    </div>
+    <div class="mood-response" id="mood-response">
+      <div class="mood-response-title" id="mood-response-title"></div>
+      <div class="mood-response-text" id="mood-response-text"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+  MODAL: BREAK THE STORY
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-break">
+  <div class="break-modal-box">
+    <button class="modal-close" onclick="closeModal('modal-break')" style="color:rgba(154,68,72,0.5)">✕</button>
+    <span class="break-icon">🕯</span>
+    <h2 class="break-title">Still Here</h2>
+    <p class="break-text" id="break-text">
+      <!-- JS fills this -->
+    </p>
+    <button class="break-close" onclick="closeModal('modal-break')">I hear you. Thank you.</button>
+  </div>
+</div>
+
+<!-- floating break button (shown on main + chapter screens) -->
+<button class="break-float" id="break-float-btn" onclick="openModal('modal-break')">when you feel low</button>
+
+<script>
+// ════════════════════════════════════════════════════
+// ✏️  CUSTOMIZE — edit everything in this block
+// ════════════════════════════════════════════════════
+
+const CONFIG = {
+  password:  "27052009",       // 🔐 Change this
+  herName:   "Rishu💛",          // 💛 Her name
+  yourSig:   "Het",  // ✍️  Your signature in chapters
+};
+
+// ── CHAPTER CONTENT ──────────────────────────────────────
+// threshold = total pages she needs to read to unlock
+// Add your own chapters by adding objects to this array
+
+const CHAPTERS = [
+  {
+    id: 0,
+    threshold: 0,
+    label: "Prologue",
+    title: "She Doesn't Know She's The Story Yet",
+    subtitle: "The beginning before the beginning",
+    content: [
+      { type: "drop", text: "This book was written before you knew it existed. It started the moment I began noticing the small things — the way you hold a book with both hands like it might escape, the way your face changes when a sentence lands exactly right. I was already reading you before I knew what I was doing." },
+      { type: "p", text: "Every story has a person at its centre who doesn't realize they're the story. They think they're just living. They think the world is indifferent. They think they're ordinary." },
+      { type: "p", text: "But someone, somewhere, is watching the way they move through rooms. Noticing the things they say under their breath. Keeping all of it — carefully, quietly — like pressed flowers between pages." },
+      { type: "p", text: "That someone is me. This is the book I've been writing about you. And now, finally — you get to read it." },
+    ]
+  },
+  {
+    id: 1,
+    threshold: 50,
+    label: "Chapter I",
+    title: "The First Time I Noticed You",
+    subtitle: "Some moments don't announce themselves",
+    content: [
+      { type: "drop", text: "It wasn't a dramatic moment. No slow motion, no cinematic lighting, no music rising in the background. It was just — you, doing something ordinary, and me suddenly unable to look away." },
+      { type: "p", text: "I think that's how it always works with the important things. They don't arrive with fanfare. They slip in quietly, rearrange something fundamental inside you, and leave before you've registered the shift." },
+      { type: "p", text: "By the time I understood what had happened, I was already changed. You had already become the thing I measured other things against — without asking permission, without even trying." },
+      { type: "p", text: "I never told you this. How could I? 'By the way, I've been carrying a quiet version of you in my head since approximately the first time you laughed near me.' That's not a thing you just say." },
+      { type: "p", text: "But it's in here now. Written down. Permanent. The first chapter of the only story that actually matters." },
+    ]
+  },
+  {
+    id: 2,
+    threshold: 150,
+    label: "Chapter II",
+    title: "The Way You Exist",
+    subtitle: "A small observation, told honestly",
+    content: [
+      { type: "drop", text: "You don't even realize it — but the way you talk about books, the way your eyes slow down on certain lines, the way you go quiet when something finally says what you'd been feeling for months — it made me want to read you instead." },
+      { type: "p", text: "There is a specific kind of person who feels things deeply and says so rarely. Who processes the world through stories because direct emotional vocabulary feels too exposed. Who is fluent in fiction and quieter in fact." },
+      { type: "p", text: "You are that person. And I find it extraordinary." },
+      { type: "p", text: "The world will keep asking you to be louder, clearer, more legible. Ignore it. Your particular kind of quiet is not a flaw. It is a frequency. Not everyone can tune to it. I can." },
+      { type: "p", text: "I've been paying attention. The way you exist in the world is, in my entirely biased opinion, one of the better things in it." },
+    ]
+  },
+  {
+    id: 3,
+    threshold: 300,
+    label: "Chapter III",
+    title: "Things I Never Said Out Loud",
+    subtitle: "What lives between the lines",
+    content: [
+      { type: "drop", text: "Here is a list of things I thought but didn't say, presented now without apology: I think you are braver than you believe. I think you are kinder than you give yourself credit for. I think the version of yourself you're most critical of is the one other people quietly admire the most." },
+      { type: "p", text: "I didn't say these things because saying them out loud in the daylight felt like too much — like I'd be handing you something fragile and watching you decide what to do with it." },
+      { type: "p", text: "So I'm saying them here instead. In writing. Where they can't be taken back." },
+      { type: "p", text: "You have this habit of apologizing for taking up space. For needing things. For feeling too much. I want you to know: there is no version of you that is too much for me. You could be three times more and I'd still be keeping up." },
+      { type: "p", text: "None of this was easy to write. But some things deserve to exist somewhere other than inside your chest. This is where I'm putting mine." },
+    ]
+  },
+  {
+    id: 4,
+    threshold: 500,
+    label: "Chapter IV",
+    title: "Why You Matter More Than You Think",
+    subtitle: "Evidence, collected over time",
+    content: [
+      { type: "drop", text: "I have been paying attention. Not in a documenting-you-for-later kind of way — in the way you pay attention to something that genuinely interests you. You are genuinely interesting to me. Here is some of the evidence:" },
+      { type: "p", text: "The way you get invested in fictional characters as if their pain is real pain — because to you it is. The way you remember the exact page number of a line that hit you. The way you recommend books differently to different people, because you've thought about what each person needs." },
+      { type: "p", text: "The way you are somehow always the person in the room who notices when someone has gone quiet. The way you don't make a show of your empathy — you just act on it, quietly, and move on." },
+      { type: "p", text: "You carry people carefully. You probably don't know how rare that is." },
+      { type: "p", text: "You matter. Specifically, concretely, in ways I could list for longer than you'd let me. You matter to the particular shape of things. Not in a general 'everyone matters' way. In a 'the world is differently shaped with you in it' way." },
+    ]
+  },
+  {
+    id: 5,
+    threshold: 750,
+    label: "Chapter V",
+    title: "The Last Page (That Isn't an Ending)",
+    subtitle: "Still writing",
+    content: [
+      { type: "drop", text: "This is the last chapter. But I want to be clear: it is not an ending. It is just the end of what I've written so far. The story continues. It continues every time you pick up a book. Every time you tell me about a line that broke you open. Every time you exist, loudly or quietly, in my proximity." },
+      { type: "p", text: "I don't know what comes next — no story worth reading does. But I know the shape of what I want: more chapters. More of the in-between moments. More of the ordinary days that somehow feel significant just because you're in them." },
+      { type: "p", text: "If I could give you one thing from all of this, it's this: I want you to see yourself the way this book sees you. Clearly. Warmly. Without all the edits you make to yourself before you let people look." },
+      { type: "p", text: "You are the protagonist. You have always been the protagonist. The reader was just the one lucky enough to notice it first." },
+      { type: "p", text: "Keep reading. I'll keep writing. That's the deal." },
+    ]
+  },
+];
+
+// ── MOOD RESPONSES ────────────────────────────────────────
+const MOODS = {
+  tired: {
+    title: "For when you're tired",
+    text: "You don't have to hold everything together right now. The to-do list will wait. The world will wait. You've carried more than your share today — put it down for a little while. I've got you."
+  },
+  happy: {
+    title: "For when you're happy",
+    text: "This. This version of you — light and easy and present. Keep it for as long as it lasts. You deserve every second of it. And for the record: watching you happy is one of my favourite things."
+  },
+  overthinking: {
+    title: "For when your mind won't stop",
+    text: "It isn't all going wrong. I know the brain likes to run those scenarios — the worst ones, on a loop. But come back to right now. Right now, you're okay. Right now, the thing you're spiralling about hasn't happened. Come back. I'll be here."
+  },
+  sad: {
+    title: "For when it's heavy",
+    text: "You don't have to explain it. Sometimes it's just heavy and there's no clean reason. That's allowed. Sit in it for a bit. Let it be real. And when you're ready to come back up, I'll be on the other side of it — same as always."
+  },
+};
+
+// ── BREAK THE STORY MESSAGE ────────────────────────────────
+const BREAK_TEXT = `I'm not going to tell you it'll be fine. You already know that — and hearing it when you feel like this doesn't help. So instead, just this: I see you. Not the version you show people, the polished, okay version — you, underneath that. That version is the one I mean when I say I care about you. You are allowed to be not okay. You're allowed to fall apart a little. That doesn't make you weak. It makes you honest. And you're one of the most real people I know. Whenever you're ready to come back up — I'll still be here. No expiry date on that.`;
+
+// ════════════════════════════════════════════════════
+// ENGINE — no need to edit below this line
+// ════════════════════════════════════════════════════
+
+let STATE = {
+  books: [],
+  totalPages: 0,
+  readChapters: new Set(),
+  editingBookId: null,
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('living-book-state');
+    if (s) {
+      const parsed = JSON.parse(s);
+      STATE.books = parsed.books || [];
+      STATE.totalPages = parsed.totalPages || 0;
+      STATE.readChapters = new Set(parsed.readChapters || []);
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  localStorage.setItem('living-book-state', JSON.stringify({
+    books: STATE.books,
+    totalPages: STATE.totalPages,
+    readChapters: [...STATE.readChapters],
+  }));
+}
+
+function recalcPages() {
+  STATE.totalPages = STATE.books.reduce((sum, b) => sum + (parseInt(b.pages) || 0), 0);
+}
+
+// ── SCREENS ──────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
+  document.getElementById(id).classList.add('visible');
+  const isMain = id === 's-main' || id === 's-chapter';
+  document.getElementById('break-float-btn').style.display = isMain ? 'block' : 'none';
+  window.scrollTo(0, 0);
+}
+
+function goBack() { showScreen('s-main'); }
+
+// ── PASSWORD ──────────────────────────────────────────────
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryPassword();
+});
+
+function tryPassword() {
+  const val = document.getElementById('pw-input').value.trim().toLowerCase();
+  const err = document.getElementById('pw-err');
+  if (val === CONFIG.password.toLowerCase()) {
+    document.getElementById('pw-input').style.borderColor = 'rgba(80,160,80,0.5)';
+    setTimeout(() => {
+      showScreen('s-main');
+      renderAll();
+    }, 500);
+  } else {
+    err.classList.add('show');
+    document.getElementById('pw-input').value = '';
+    setTimeout(() => err.classList.remove('show'), 2800);
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderAll() {
+  renderCounter();
+  renderProgress();
+  renderBooks();
+  renderChapters();
+  document.getElementById('break-text').textContent = BREAK_TEXT;
+}
+
+function renderCounter() {
+  document.getElementById('total-pages-display').textContent = STATE.totalPages.toLocaleString();
+  const sub = STATE.books.length === 0
+    ? "No books yet — but you're already my favourite story."
+    : `Across ${STATE.books.length} book${STATE.books.length > 1 ? 's' : ''}`;
+  document.getElementById('tracker-subtext').textContent = sub;
+}
+
+function renderProgress() {
+  const unlocked = CHAPTERS.filter(c => c.threshold <= STATE.totalPages);
+  const locked   = CHAPTERS.filter(c => c.threshold > STATE.totalPages);
+  const wrap = document.getElementById('next-unlock-wrap');
+
+  if (locked.length === 0) {
+    document.getElementById('next-chapter-label').textContent = "All chapters unlocked ✦";
+    document.getElementById('progress-fill').style.width = '100%';
+    document.getElementById('progress-text').textContent = "You've read your way to the very last page.";
+    return;
+  }
+
+  const next = locked[0];
+  const prev = unlocked[unlocked.length - 1];
+  const prevThresh = prev ? prev.threshold : 0;
+  const range = next.threshold - prevThresh;
+  const done  = STATE.totalPages - prevThresh;
+  const pct   = Math.min(100, Math.max(0, (done / range) * 100));
+  const remaining = next.threshold - STATE.totalPages;
+
+  document.getElementById('next-chapter-label').textContent =
+    `${next.label}: "${next.title}"`;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent =
+    `${remaining} more pages to unlock this chapter`;
+}
+
+function renderBooks() {
+  const list = document.getElementById('books-list');
+  if (STATE.books.length === 0) {
+    list.innerHTML = `<div class="empty-books"
+      data-secret="No books yet… but you're already my favourite story.">
+      Add a book to begin your journey ↓
+    </div>`;
+    return;
+  }
+  list.innerHTML = STATE.books.map(b => `
+    <div class="book-item" onclick="editBook('${b.id}')">
+      <span class="book-icon">📖</span>
+      <div class="book-info">
+        <div class="book-title-text">${escHtml(b.title)}</div>
+        <div class="book-pages-text">${b.pages} pages read</div>
+      </div>
+      <button class="book-edit-btn" title="Edit">✎</button>
+    </div>
+  `).join('');
+}
+
+function renderChapters() {
+  const grid = document.getElementById('chapters-grid');
+  grid.innerHTML = CHAPTERS.map(ch => {
+    const isUnlocked = ch.threshold <= STATE.totalPages;
+    const wasRead = STATE.readChapters.has(ch.id);
+    if (isUnlocked) {
+      return `
+        <div class="chapter-card unlocked" onclick="openChapter(${ch.id})" style="animation-delay:${ch.id*0.07}s">
+          <div class="ch-number">${ch.label}</div>
+          <div class="ch-title">${ch.title}</div>
+          <div class="ch-subtitle">${ch.subtitle}</div>
+          ${wasRead ? '<span class="ch-read-tag">Read</span>' : ''}
+          <span class="ch-arrow">→</span>
+        </div>`;
+    } else {
+      return `
+        <div class="chapter-card locked">
+          <div class="ch-number">${ch.label}</div>
+          <div class="ch-title">${ch.title}</div>
+          <div class="ch-subtitle">${ch.subtitle}</div>
+          <div class="ch-lock-info">
+            <span class="ch-lock-icon">🔒</span>
+            <span class="ch-lock-text">Unlocks at ${ch.threshold} pages</span>
+          </div>
+        </div>`;
+    }
+  }).join('');
+}
+
+// ── CHAPTER READER ────────────────────────────────────────
+function openChapter(id) {
+  const ch = CHAPTERS.find(c => c.id === id);
+  if (!ch || ch.threshold > STATE.totalPages) return;
+
+  STATE.readChapters.add(id);
+  saveState();
+
+  const paragraphs = ch.content.map(p => {
+    if (p.type === 'drop') return `<p class="drop-cap">${p.text}</p>`;
+    return `<p>${p.text}</p>`;
+  }).join('');
+
+  document.getElementById('reader-body').innerHTML = `
+    <div class="reader-ornament">— ✦ —</div>
+    <div class="reader-chapter-num">${ch.label}</div>
+    <h1 class="reader-chapter-title">${ch.title}</h1>
+    <p class="reader-chapter-sub">${ch.subtitle}</p>
+    <div class="reader-text">${paragraphs}</div>
+    <div class="reader-sig">— ${CONFIG.yourSig}</div>
+    <div class="reader-footer-ornament">— ✦ —</div>
+  `;
+
+  showScreen('s-chapter');
+  renderChapters();
+}
+
+// ── ADD / EDIT BOOK ───────────────────────────────────────
+function editBook(id) {
+  const b = STATE.books.find(x => x.id === id);
+  if (!b) return;
+  STATE.editingBookId = id;
+  document.getElementById('add-book-modal-title').textContent = 'Update This Book';
+  document.getElementById('add-book-submit-btn').textContent = 'Update →';
+  document.getElementById('input-book-title').value = b.title;
+  document.getElementById('input-book-pages').value = b.pages;
+  openModal('modal-add-book');
+}
+
+function submitBook() {
+  const title = document.getElementById('input-book-title').value.trim();
+  const pages = parseInt(document.getElementById('input-book-pages').value) || 0;
+  if (!title) return;
+
+  if (STATE.editingBookId) {
+    const b = STATE.books.find(x => x.id === STATE.editingBookId);
+    if (b) { b.title = title; b.pages = pages; }
+    STATE.editingBookId = null;
+  } else {
+    STATE.books.push({ id: 'b' + Date.now(), title, pages });
+  }
+
+  recalcPages();
+  checkNewUnlocks();
+  saveState();
+  renderAll();
+  closeModal('modal-add-book');
+  document.getElementById('input-book-title').value = '';
+  document.getElementById('input-book-pages').value = '';
+  document.getElementById('add-book-modal-title').textContent = 'Log a Book';
+  document.getElementById('add-book-submit-btn').textContent = 'Add to My Story →';
+}
+
+let prevUnlocked = new Set();
+
+function checkNewUnlocks() {
+  CHAPTERS.forEach(ch => {
+    const wasLocked = !prevUnlocked.has(ch.id);
+    const nowUnlocked = ch.threshold <= STATE.totalPages;
+    if (wasLocked && nowUnlocked && ch.id > 0) {
+      setTimeout(() => flashNewUnlock(ch.id), 300);
+    }
+    if (nowUnlocked) prevUnlocked.add(ch.id);
+  });
+}
+
+function flashNewUnlock(id) {
+  const cards = document.querySelectorAll('.chapter-card.unlocked');
+  cards.forEach(card => {
+    const num = card.querySelector('.ch-number');
+    const ch = CHAPTERS.find(c => c.id === id);
+    if (ch && num && num.textContent === ch.label) {
+      card.classList.add('new-unlock');
+      setTimeout(() => card.classList.remove('new-unlock'), 2000);
+    }
+  });
+}
+
+// ── MOOD ──────────────────────────────────────────────────
+function selectMood(key) {
+  document.querySelectorAll('.mood-option').forEach(o => o.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  const m = MOODS[key];
+  document.getElementById('mood-response-title').textContent = m.title;
+  document.getElementById('mood-response-text').textContent = m.text;
+  const r = document.getElementById('mood-response');
+  r.classList.remove('show');
+  void r.offsetWidth;
+  r.classList.add('show');
+}
+
+// ── MODALS ────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (id === 'modal-mood') {
+    document.querySelectorAll('.mood-option').forEach(o => o.classList.remove('selected'));
+    document.getElementById('mood-response').classList.remove('show');
+  }
+  if (id === 'modal-add-book') {
+    STATE.editingBookId = null;
+    document.getElementById('add-book-modal-title').textContent = 'Log a Book';
+    document.getElementById('add-book-submit-btn').textContent = 'Add to My Story →';
+    document.getElementById('input-book-title').value = '';
+    document.getElementById('input-book-pages').value = '';
+  }
+}
+
+// click overlay to close
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m) closeModal(m.id);
+  });
+});
+
+// enter key for book modal
+document.getElementById('input-book-pages').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitBook();
+});
+
+// ── UTILS ─────────────────────────────────────────────────
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──────────────────────────────────────────────────
+loadState();
+CHAPTERS.forEach(ch => {
+  if (ch.threshold <= STATE.totalPages) prevUnlocked.add(ch.id);
+});
+</script>
+</body>
+</html>
